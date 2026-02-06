@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>可交互电子大屏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        background: #181c2a;
+        color: #fff;
+        font-family: "Segoe UI", Arial, sans-serif;
+        overflow: hidden;
+      }
+      .dashboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
+        height: 100vh;
+        padding: 40px 20px;
+        box-sizing: border-box;
+      }
+      .card {
+        background: #232a3b;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        margin: 20px;
+        padding: 32px 24px;
+        min-width: 320px;
+        min-height: 220px;
+        flex: 1 1 350px;
+        max-width: 480px;
+        transition: transform 0.2s;
+        cursor: pointer;
+      }
+      .card:hover {
+        transform: scale(1.04);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      .card h2 {
+        margin-top: 0;
+        font-size: 2em;
+        color: #4fd1c5;
+      }
+      .counter {
+        font-size: 3em;
+        margin: 40px 0;
+        text-align: center;
+        user-select: none;
+      }
+      .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+      .btn {
+        background: #4fd1c5;
+        color: #181c2a;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 28px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #38b2ac;
+      }
+      @media (max-width: 900px) {
+        .dashboard {
+          flex-direction: column;
+          align-items: center;
+          padding: 20px 5px;
+        }
+        .card {
+          min-width: 90vw;
+          max-width: 98vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="card" id="counterCard">
+        <h2>实时计数器</h2>
+        <div class="counter" id="counterValue">0</div>
+        <div class="btn-group">
+          <button class="btn" onclick="changeCounter(1)">增加</button>
+          <button class="btn" onclick="changeCounter(-1)">减少</button>
+          <button class="btn" onclick="resetCounter()">重置</button>
+        </div>
+      </div>
+      <div class="card" id="chartCard">
+        <h2>动态数据图表</h2>
+        <canvas id="myChart" width="400" height="120"></canvas>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // 计数器逻辑
+      let counter = 0;
+      function updateCounter() {
+        document.getElementById("counterValue").textContent = counter;
+      }
+      function changeCounter(val) {
+        counter += val;
+        updateCounter();
+      }
+      function resetCounter() {
+        counter = 0;
+        updateCounter();
+      }
+      updateCounter();
+
+      // 动态图表逻辑
+      const ctx = document.getElementById("myChart").getContext("2d");
+      const chartData = {
+        labels: Array.from({ length: 10 }, (_, i) => `T-${9 - i}`),
+        datasets: [
+          {
+            label: "实时数据",
+            data: Array.from({ length: 10 }, () =>
+              Math.floor(Math.random() * 100),
+            ),
+            backgroundColor: "rgba(79,209,197,0.2)",
+            borderColor: "#4fd1c5",
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: "#4fd1c5",
+          },
+        ],
+      };
+      const myChart = new Chart(ctx, {
+        type: "line",
+        data: chartData,
+        options: {
+          responsive: false,
+          scales: {
+            y: { beginAtZero: true },
+          },
+        },
+      });
+      setInterval(() => {
+        chartData.datasets[0].data.shift();
+        chartData.datasets[0].data.push(Math.floor(Math.random() * 100));
+        myChart.update();
+      }, 1500);
+    </script>
+  </body>
+</html>
